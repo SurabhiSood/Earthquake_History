@@ -1,15 +1,34 @@
-//obtain the url from API Documentation-EQ Catalog [https://earthquake.usgs.gov/fdsnws/event/1/]
-//create the query with desired method and perimeters(format,lat,long,start and end date)
+// Store our API endpoint inside queryUrl
+var queryUrl = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2014-01-01&endtime=" +
+  "2014-01-02&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
 
-var url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2014-01-01&endtime=" +
-"2014-01-02&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
-// performing GET request to read the data
-d3.json(url, function(data){
+// Perform a GET request to the query URL
+d3.json(queryUrl, function(data) {
+  // Once we get a response, send the data.features object to the createFeatures function
   console.log(data);
-})
+  createMarkers(data.features);
+});
 
-// create the basic Map
-function createMap(){
+function createMarkers(earthquakeData){
+
+  // Define a function we want to run once for each feature in the features array
+  // Give each feature a popup describing the place and time of the earthquake
+  function onEachFeature(feature,layer){
+    layer.bindPopup("<h3>" + feature.properties.place +
+    "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
+  }
+  // Create a GeoJSON layer containing the features array on the earthquakeData object
+  // Run the onEachFeature function once for each piece of data in the array
+  var earthquakes = L.geoJSON(earthquakeData, {
+    onEachFeature: onEachFeature
+  });
+
+  // Sending our earthquakes layer to the createMap function
+  createMap(earthquakes);
+}
+
+
+function createMap(earthquakes) {
 
   // Define streetmap and darkmap layers
   var streetmap = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -18,14 +37,14 @@ function createMap(){
     maxZoom: 18,
     zoomOffset: -1,
     id: "mapbox/streets-v11",
-    accessToken: API_KEY
+    accessToken: "pk.eyJ1Ijoic29vZHN1cjAwNyIsImEiOiJja2MzamdhcWQyZWZ0MzRueGF6aHZidnZlIn0._wZe5Ajs36_OzWOAO6mGfA"
   });
 
   var darkmap = L.tileLayer("https://api.mapbox.com/styles/v1/mapbox/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "dark-v10",
-    accessToken: API_KEY
+    accessToken: "pk.eyJ1Ijoic29vZHN1cjAwNyIsImEiOiJja2MzamdhcWQyZWZ0MzRueGF6aHZidnZlIn0._wZe5Ajs36_OzWOAO6mGfA"
   });
 
   // Define a baseMaps object to hold our base layers
@@ -34,7 +53,7 @@ function createMap(){
     "Dark Map": darkmap
   };
 
-  // Create overlay object to hold our overlay layer
+  //Create overlay object to hold our overlay layer
   var overlayMaps = {
     Earthquakes: earthquakes
   };
@@ -54,5 +73,5 @@ function createMap(){
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+};
 
-}
