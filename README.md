@@ -1,10 +1,13 @@
-USGS: Earthquake Visualizations
+### USGS: Earthquake Visualizations
+
 ![earthquakemap](https://github.com/SurabhiSood/Earthquake_History/blob/master/Images/5-Advanced.png)
 
 ### Goal
+
 Use Leaflet.js to visualize earthquakes by plotting markers on a global map, colored and sized by magnitude.
 
 ### Process
+
 First, I designed a basic HTML file with the map container along with a css file set with the dimensions of the map. Then, in the logic-1.js file, I created a Leaflet map object and tile layer, importing the necessary API key through a config file.
 
 I wanted to visualize one week’s worth of earthquakes around the world, so I found the appropriate link on the [USGS website](http://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) and stored that URL address as a variable. Then, using d3.json(), I accessed that data and created a function to plot a circle marker for each earthquake.
